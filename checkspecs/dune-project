@@ -1,0 +1,22 @@
+(lang dune 3.13)
+
+(name checkspecs)
+
+(generate_opam_files true)
+
+(package
+ (name checkspecs)
+ (maintainers "arch-specs maintainers")
+ (authors "arch-specs authors")
+ (homepage "https://github.com/formosa-crypto/arch-specs")
+ (bug_reports "https://github.com/formosa-crypto/arch-specs/issues")
+ (synopsis "ISA specification checker")
+ (license "MIT")
+ (depends
+  (ocaml (>= 4.08.0))
+  batteries
+  cmdliner
+  easycrypt
+  hex
+  progress
+))

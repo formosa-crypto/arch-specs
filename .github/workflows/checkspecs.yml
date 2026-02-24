@@ -1,0 +1,59 @@
+name: Build checkspecs
+
+on:
+  push:
+    branches:
+      - 'main'
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: checkspecs
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up OCaml
+        uses: ocaml/setup-ocaml@v3
+        with:
+          ocaml-compiler: 5.3.0
+          opam-disable-sandboxing: true
+
+      - name: Pin easycrypt from GitHub branch
+        run: opam pin add -ny easycrypt git+https://github.com/EasyCrypt/easycrypt.git#bdep_ecCircuitsRefactor
+
+      - name: Install dependencies
+        run: opam install --deps-only -y .
+
+      - name: Build
+        run: opam exec -- dune build src/checkspecs.exe
+
+      - name: Upload checkspecs binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: checkspecs-bin
+          path: checkspecs/_build/default/src/checkspecs.exe
+          if-no-files-found: error
+
+  check-specs:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download checkspecs binary
+        uses: actions/download-artifact@v4
+        with:
+          name: checkspecs-bin
+          path: ./.ci-bin
+
+      - name: Check specs/avx2.spec (65k tests per instruction)
+        run: |
+          chmod +x ./.ci-bin/checkspecs.exe
+          ./.ci-bin/checkspecs.exe -n 65536 ./specs/avx2.spec

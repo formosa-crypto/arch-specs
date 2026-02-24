@@ -1,0 +1,3 @@
+[submodule "submodules/simde"]
+	path = checkspecs/submodules/simde
+	url = git@github.com:simd-everywhere/simde.git
