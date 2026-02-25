@@ -16,7 +16,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
         with:
-          submodules: recursive
+          submodules: false
 
       - name: Set up OCaml
         uses: ocaml/setup-ocaml@v3
@@ -56,4 +56,4 @@ jobs:
       - name: Check specs/avx2.spec (65k tests per instruction)
         run: |
           chmod +x ./.ci-bin/checkspecs.exe
-          ./.ci-bin/checkspecs.exe -n 65536 ./specs/avx2.spec
+          ./.ci-bin/checkspecs.exe --fail-on-simde -n 65536 ./specs/avx2.spec

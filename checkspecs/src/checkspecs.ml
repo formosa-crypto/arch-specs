@@ -102,6 +102,43 @@ let tests : test list = [
   ;
   { name = "VPMULHRS_16u16"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_mulhrs_epi16); }
+  ;
+  { name = "VPSRL_4u64"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_srl_epi64); }
+  ;
+  { name = "VPSRL_8u32"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_srl_epi32); }
+  ;
+  { name = "VPSRL_16u16"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_srl_epi16); }
+  ;
+  { name = "VPSRA_8u32"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_sra_epi32); }
+  ;
+  { name = "VPSRA_16u16"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_sra_epi16); }
+  ;
+  { name = "VPSLL_4u64"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_sll_epi64); }
+  ;
+  { name = "VPSLL_8u32"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_sll_epi32); }
+  ;
+  { name = "VPSLL_16u16"
+  ; prim = (prim2 (M256, M128) M256 Avx2.mm256_sll_epi16); }
+  ;
+  { name = "VPSLLV_4u64"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_sllv_epi64); }
+  ;
+  { name = "VPSLLV_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_sllv_epi32); }
+  ;
+  { name = "VPSRLV_4u64"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_srlv_epi64); }
+  ;
+  { name = "VPSRLV_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_srlv_epi32); }
+  ;
 ]
 
 (* ======================================================================== *)
@@ -268,10 +305,10 @@ let evaluate_test ~(ntests : int) ((name, adef) : string * S.Ast.adef) : bool =
         Format.eprintf "%-*s: 0x%s@." width "expected" (Hex.of_bytes e.expected |> Hex.show)
 
       | MissingTest _ ->
-        Format.eprintf "Missing test for `%s'" name
+        Format.eprintf "Missing test for `%s'@." name
 
       | InvalidSignature ->
-        Format.eprintf "Mismatch signature for `%s'" name
+        Format.eprintf "Mismatch signature for `%s'@." name
     end;
     log_non_tty (Format.sprintf "[checkspecs] stop %s (failed)" name);
     false
@@ -308,7 +345,8 @@ end
 type cli = {
   ntests : int;
   filter : Str.regexp option;
-  spec   : string;
+  fail_on_simde : bool;
+  spec : string;
 }
 
 (* ------------------------------------------------------------------------ *)
@@ -325,18 +363,28 @@ let cli_term : cli Cmdliner.Term.t =
       value
       & opt (some CLI.regexp_conv) None
       & info ["filter"] ~docv:"REGEXP" ~doc:"Regexp used to filter spec names.") in
+  let fail_on_simde =
+    Arg.(
+      value
+      & flag
+      & info ["fail-on-simde"] ~doc:"Fail immediately when SIMD implementation is SIMDe.") in
   let spec =
     Arg.(
       required
       & pos 0 (some string) None
       & info [] ~docv:"FILENAME" ~doc:"Specification filename.") in
 
-  Term.(const (fun ntests filter spec ->
-    { ntests; filter; spec }
-  ) $ ntests $ filter $ spec)
+  Term.(const (fun ntests filter fail_on_simde spec ->
+    { ntests; filter; fail_on_simde; spec }
+  ) $ ntests $ filter $ fail_on_simde $ spec)
 
 (* ------------------------------------------------------------------------ *)
 let main (cli : cli) =
+  if cli.fail_on_simde && A.using_simde () then (
+    Format.eprintf "SIMDe is enabled; refusing to run with --fail-on-simde.@.";
+    exit 1
+  );
+
   let specs  = File.with_file_in cli.spec (S.Io.parse cli.spec) in
   let specs  = S.Typing.tt_program S.Typing.Env.empty specs in
   let specs  =
