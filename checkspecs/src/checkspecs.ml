@@ -15,34 +15,62 @@ type primval =
   | PrimVal : 'a primty * 'a -> primval
 
 (* ------------------------------------------------------------------------ *)
+type extend = ENone | EZero
+
+(* ------------------------------------------------------------------------ *)
 type (_, _) primsig =
   | Ret : 'r primty -> ('r, 'r) primsig
-  | Arg : 'a primty * ('b, 'r) primsig -> ('a -> 'b, 'r) primsig
+  | Arg : 'a primty * extend * ('b, 'r) primsig -> ('a -> 'b, 'r) primsig
 
 (* ------------------------------------------------------------------------ *)
 type prim =
   | Prim : ('a, 'r) primsig * 'a -> prim
 
 (* ------------------------------------------------------------------------ *)
-let prim1 (a : _ primty) (r : _ primty) f =
-  Prim (Arg (a, (Ret r)), f)
+let mkarg
+  : type a b r . ?extend:extend -> a primty -> (b, r) primsig -> (a -> b, r) primsig
+  = fun ?(extend = ENone) a r -> Arg (a, extend, r)
 
 (* ------------------------------------------------------------------------ *)
-let prim2 ((a1, a2) : _ primty * _ primty) (r : _ primty) f =
-  Prim (Arg (a1, (Arg (a2, Ret r))), f)
+let mkret
+  : type r . r primty -> (r, r) primsig
+  = fun r -> Ret r
 
 (* ------------------------------------------------------------------------ *)
-let prim3 ((a1, a2, a3) : _ primty * _ primty * _ primty) (r : _ primty) f =
-  Prim (Arg (a1, (Arg (a2, (Arg (a3, Ret r))))), f)
+let prim1 ?e a r f =
+  Prim (mkarg ?extend:e a (mkret r), f)
+
+(* ------------------------------------------------------------------------ *)
+let prim2 ?e1 ?e2 (a1, a2) r f =
+  Prim (mkarg ?extend:e1 a1 (mkarg ?extend:e2 a2 (mkret r)), f)
+
+(* ------------------------------------------------------------------------ *)
+let prim3 ?e1 ?e2 ?e3 (a1, a2, a3) r f =
+  Prim (mkarg ?extend:e1 a1 (mkarg ?extend:e2 a2 (mkarg ?extend:e3 a3 (mkret r))), f)
 
 (* ======================================================================== *)
 type test = {
   name : string;
-  prim : prim
+  prim : prim;
 }
 
 (* ------------------------------------------------------------------------ *)
 let tests : test list = [
+  { name = "VPBROADCAST_2u128"
+  ; prim = (prim1 M128 M256 Avx2.mm256_broadcastsi128_si256); }
+  ;
+  { name = "VPBROADCAST_4u64"
+  ; prim = (prim1 ~e:EZero M128 M256 Avx2.mm256_broadcastq_epi64); }
+  ;
+  { name = "VPBROADCAST_8u32"
+  ; prim = (prim1 ~e:EZero M128 M256 Avx2.mm256_broadcastd_epi32); }
+  ;
+  { name = "VPBROADCAST_16u16"
+  ; prim = (prim1 ~e:EZero M128 M256 Avx2.mm256_broadcastw_epi16); }
+  ;
+  { name = "VPERMD"
+  ; prim = (prim2 (M256, M256) M256 (fun w idx -> Avx2.mm256_permutevar8x32_epi32 idx w)); }
+  ;
   { name = "VPAND_128"
   ; prim = (prim2 (M128, M128) M128 Avx2.mm_and_si128); }
   ;
@@ -139,6 +167,30 @@ let tests : test list = [
   { name = "VPSRLV_8u32"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_srlv_epi32); }
   ;
+  { name = "VPUNPCKL_4u64"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpacklo_epi64); }
+  ;
+  { name = "VPUNPCKL_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpacklo_epi32); }
+  ;
+  { name = "VPUNPCKL_16u16"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpacklo_epi16); }
+  ;
+  { name = "VPUNPCKL_32u8"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpacklo_epi8); }
+  ;
+  { name = "VPUNPCKH_4u64"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpackhi_epi64); }
+  ;
+  { name = "VPUNPCKH_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpackhi_epi32); }
+  ;
+  { name = "VPUNPCKH_16u16"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpackhi_epi16); }
+  ;
+  { name = "VPUNPCKH_32u8"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpackhi_epi8); }
+  ;
 ]
 
 (* ======================================================================== *)
@@ -158,13 +210,18 @@ exception TestError of testerror
 
 (* ------------------------------------------------------------------------ *)
 let check_ty_compatible 
-  : type a . a primty -> S.Ast.atype -> unit
-  = fun (a : _ primty) (ty : S.Ast.atype)  ->
-  match a, ty with
-  | M256, `W 256
-  | M128, `W 128 -> ()
+  : type a . ?extend:extend -> a primty -> S.Ast.atype -> unit
+  = fun ?(extend : extend = ENone) (a : _ primty) (ty : S.Ast.atype)  ->
 
-  | _ -> raise (TestError InvalidSignature)
+    match ty with
+    | `W tysize -> begin
+      let asize = match a with M256 -> 256 | M128 -> 128 in
+      match extend with
+      | ENone when tysize = asize -> ()
+      | EZero when tysize <= asize -> ()
+      | _ -> raise (TestError InvalidSignature)
+    end
+    | _ -> raise (TestError InvalidSignature)
 
 (* ------------------------------------------------------------------------ *)
 let check_signature (t : test) (c : S.Ast.adef) =
@@ -174,8 +231,8 @@ let check_signature (t : test) (c : S.Ast.adef) =
       match sig_, arguments with
       | Ret retty, [] ->
         check_ty_compatible retty (c.rettype :> S.Ast.atype)
-      | Arg (aty, asty), (_, argty) :: args ->
-        check_ty_compatible aty (argty :> S.Ast.atype);
+      | Arg (aty, extend, asty), (_, argty) :: args ->
+        check_ty_compatible ~extend aty (argty :> S.Ast.atype);
         check_signature asty args
       | _, _ ->
         raise (TestError InvalidSignature)
@@ -201,7 +258,7 @@ let generate_test_vector (t : test) =
       match sig_ with
       | Ret ty ->
         ([], PrimVal (ty, refv))
-      | Arg (aty, rty) ->
+      | Arg (aty, _, rty) ->
         let input = generate_input aty in
         let (inputs, refv) = generate rty (refv input) in
         (PrimVal (aty, input) :: inputs, refv)

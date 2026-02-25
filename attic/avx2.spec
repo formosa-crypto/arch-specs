@@ -2,12 +2,7 @@
 # 256 bit logical and (maybe change in ecBDep to VPAND)
 
 
-# Intel intrinsic: _mm256_permutexvar_epi32
-VPERMD(widx@256, w@256) -> @256 =
-  map<32, 8>(
-    fun idx@32 . let i = idx[0:3] in w[@32|i],
-    widx
-  )
+
 
 # Intel intrinsic: _mm256_permute4x64_epi64
 VPERMQ(w@256, i@8) -> @256 =
@@ -37,19 +32,6 @@ VPERM2I128(src1@256, src2@256, i@8) -> @256 =
           let w1 = concat<256>(src1,src2) in
           let w2 = w1[@128|control[@2|0]] in w2,
       i)
-
-# Intel intrinsic: _mm256_broadcastw_epi16
-VPBROADCAST_16u16(w@16) -> @256 = 
-  repeat<16>(w[@16|0], 16)
-
-VPBROADCAST_8u32(w@32) -> @256 = 
-  repeat<32>(w[@32|0], 8)
-
-VPBROADCAST_4u64(w@64) -> @256 = 
-  repeat<64>(w[@64|0], 4)
-
-VPBROADCAST_2u128(w@128) -> @256 = 
-  repeat<128>(w[@128|0], 2)
 
 VPSLLDQ_256(w@256, count@8) -> @256 =
   map<128, 2>(sll<128>(., sll<8>(count, 3)), w)
@@ -247,34 +229,7 @@ VPMOVMSKB_u256u64(w@256) -> @64 =
 VPMOVMSKB_u256u32(w@256) -> @32 =
   map<8, 32>(fun i@8 . i[7], w)
 
-# Intel intrinsic: _mm256_unpacklo_epi8
-VPUNPCKL_32u8(w1@256, w2@256) -> @256 =
-  let interleave (w1@64, w2@64) =
-    map<8, 8>(
-      fun w1@8 w2@8 . concat<8>(w1, w2),
-      w1,
-      w2
-    )
-  in
 
-  concat<128>(
-    interleave(w1[@64|0], w2[@64|0]),
-    interleave(w1[@64|2], w2[@64|2])
-  )
-
-# CHECKME
-VPUNPCKL_4u64(a@256, b@256) -> @256 =
-  let interleave (w1@128, w2@128) =
-          concat<64>(w1[@64|0], w2[@64|0]) in
-    concat<128>(interleave(a[@128|0],b[@128|0]),
-                    interleave(a[@128|1],b[@128|1]))
-
-# CHECKME
-VPUNPCKH_4u64(a@256, b@256) -> @256 =
-  let interleave (w1@128, w2@128) =
-          concat<64>(w1[@64|1], w2[@64|1]) in
-    concat<128>(interleave(a[@128|0],b[@128|0]),
-                    interleave(a[@128|1],b[@128|1]))
 
 #CHECKME
 VMOVSLDUP_256(a@256) -> @256 =
@@ -389,12 +344,6 @@ POPCOUNT_64(x@64) -> @64 =
 VPINC_8u8(w@64) -> @64 =
   map<8, 8>(incr<8>, w)
 
-VPUNPCKL_16u8(w1@64, w2@64) -> @128 =
-  map<8, 8>(
-    fun w1@8 w2@8 . concat<8>(w1, w2),
-    w1,
-    w2
-  )
 
 VPSHUFB_128(w@128, widx@128) -> @128 =
   map<8, 16>(

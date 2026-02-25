@@ -1,3 +1,30 @@
+# Intel intrinsic: _mm256_broadcastq_epi64
+# Note: input should be @128
+VPBROADCAST_4u64(w@64) -> @256 = 
+  repeat<64>(w, 4)
+
+# Intel intrinsic: _mm256_broadcastd_epi32
+# Note: input should be @128
+VPBROADCAST_8u32(w@32) -> @256 = 
+  repeat<32>(w, 8)
+
+# Intel intrinsic: _mm256_broadcastw_epi16
+# Note: input should be @128
+VPBROADCAST_16u16(w@16) -> @256 = 
+  repeat<16>(w, 16)
+
+# Intel intrinsic: _mm256_broadcastsi128_si256
+VPBROADCAST_2u128(w@128) -> @256 = 
+  repeat<128>(w, 2)
+
+# Intel intrinsic: _mm256_permutevar8x32_epi32
+# Note: arguments are swapped
+VPERMD(widx@256, w@256) -> @256 =
+  map<32, 8>(
+    fun idx@32 . let i = idx[0:3] in w[@32|i],
+    widx
+  )
+
 # Intel intrinsic: _mm2_and_si128
 VPAND_128(w1@128, w2@128) -> @128 = 
   and<128>(w1, w2)
@@ -103,9 +130,6 @@ VPSRL_16u16(w@256, count@128) -> @256 =
     ? 0
     : map<16, 16>(srl<16>(., count[@8|0]), w)
 
-# Intel intrinsic: _mm256_sra_epi64
-# Not in SIMDe
-
 # Intel intrinsic: _mm256_sra_epi32
 VPSRA_8u32(w@256, count@128) -> @256 =
   let c = ugt<64>(count[@64|0], 31) ? 31 : count[@8|0] in
@@ -168,4 +192,116 @@ VPSRLV_8u32(ws@256, counts@256) -> @256 =
       uge<32>(count, 32) ? 0 : srl<32>(w, count[@8|0]),
     ws,
     counts
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi8
+VPUNPCKL_32u8(w1@256, w2@256) -> @256 =
+  let interleave (w1@64, w2@64) =
+    map<8, 8>(
+      fun w1@8 w2@8 . concat<8>(w1, w2),
+      w1,
+      w2
+    )
+  in
+
+  concat<128>(
+    interleave(w1[@64|0], w2[@64|0]),
+    interleave(w1[@64|2], w2[@64|2])
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi16
+VPUNPCKL_16u16(w1@256, w2@256) -> @256 =
+  let interleave (w1@64, w2@64) =
+    map<16, 4>(
+      fun w1@16 w2@16 . concat<16>(w1, w2),
+      w1,
+      w2
+    )
+  in
+
+  concat<128>(
+    interleave(w1[@64|0], w2[@64|0]),
+    interleave(w1[@64|2], w2[@64|2])
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi16
+VPUNPCKL_8u32(w1@256, w2@256) -> @256 =
+  let interleave (w1@64, w2@64) =
+    map<32, 2>(
+      fun w1@32 w2@32 . concat<32>(w1, w2),
+      w1,
+      w2
+    )
+  in
+
+  concat<128>(
+    interleave(w1[@64|0], w2[@64|0]),
+    interleave(w1[@64|2], w2[@64|2])
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi64
+VPUNPCKL_4u64(w1@256, w2@256) -> @256 =
+  let interleave (w1@128, w2@128) =
+    concat<64>(w1[@64|0], w2[@64|0])
+  in
+
+  concat<128>(
+    interleave(w1[@128|0], w2[@128|0]),
+    interleave(w1[@128|1], w2[@128|1])
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi8
+VPUNPCKH_32u8(w1@256, w2@256) -> @256 =
+  let interleave (w1@64, w2@64) =
+    map<8, 8>(
+      fun w1@8 w2@8 . concat<8>(w1, w2),
+      w1,
+      w2
+    )
+  in
+
+  concat<128>(
+    interleave(w1[@64|1], w2[@64|1]),
+    interleave(w1[@64|3], w2[@64|3])
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi16
+VPUNPCKH_16u16(w1@256, w2@256) -> @256 =
+  let interleave (w1@64, w2@64) =
+    map<16, 4>(
+      fun w1@16 w2@16 . concat<16>(w1, w2),
+      w1,
+      w2
+    )
+  in
+
+  concat<128>(
+    interleave(w1[@64|1], w2[@64|1]),
+    interleave(w1[@64|3], w2[@64|3])
+  )
+
+# Intel intrinsic: _mm256_unpacklo_epi16
+VPUNPCKH_8u32(w1@256, w2@256) -> @256 =
+  let interleave (w1@64, w2@64) =
+    map<32, 2>(
+      fun w1@32 w2@32 . concat<32>(w1, w2),
+      w1,
+      w2
+    )
+  in
+
+  concat<128>(
+    interleave(w1[@64|1], w2[@64|1]),
+    interleave(w1[@64|3], w2[@64|3])
+  )
+
+# Intel intrinsic: _mm256_unpackhi_epi64
+VPUNPCKH_4u64(w1@256, w2@256) -> @256 =
+  let interleave (w1@128, w2@128) =
+    concat<64>(w1[@64|1], w2[@64|1])
+  in
+
+  concat<128>(
+    interleave(w1[@128|0], w2[@128|0]),
+    interleave(w1[@128|1], w2[@128|1])
   )

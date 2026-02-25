@@ -232,6 +232,11 @@ module M128 = struct
 end
 
 (* -------------------------------------------------------------- *)
+external mm256_broadcastq_epi64 : m128 -> m256 = "caml_mm256_broadcastq_epi64"
+external mm256_broadcastd_epi32 : m128 -> m256 = "caml_mm256_broadcastd_epi32"
+external mm256_broadcastw_epi16 : m128 -> m256 = "caml_mm256_broadcastw_epi16"
+external mm256_broadcastsi128_si256 : m128 -> m256 = "caml_mm256_broadcastsi128_si256"
+external mm256_permutevar8x32_epi32 : m256 -> m256 -> m256 = "caml_mm256_permutevar8x32_epi32"
 external mm_and_si128 : m128 -> m128 -> m128 = "caml_mm_and_si128"
 external mm256_and_si256 : m256 -> m256 -> m256 = "caml_mm256_and_si256"
 external mm_andnot_si128 : m128 -> m128 -> m128 = "caml_mm_andnot_si128"
@@ -264,3 +269,11 @@ external mm256_srlv_epi32 : m256 -> m256 -> m256 = "caml_mm256_srlv_epi32"
 external mm256_srlv_epi64 : m256 -> m256 -> m256 = "caml_mm256_srlv_epi64"
 external mm256_sllv_epi32 : m256 -> m256 -> m256 = "caml_mm256_sllv_epi32"
 external mm256_sllv_epi64 : m256 -> m256 -> m256 = "caml_mm256_sllv_epi64"
+external mm256_unpacklo_epi8 : m256 -> m256 -> m256 = "caml_mm256_unpacklo_epi8"
+external mm256_unpacklo_epi16 : m256 -> m256 -> m256 = "caml_mm256_unpacklo_epi16"
+external mm256_unpacklo_epi32 : m256 -> m256 -> m256 = "caml_mm256_unpacklo_epi32"
+external mm256_unpacklo_epi64 : m256 -> m256 -> m256 = "caml_mm256_unpacklo_epi64"
+external mm256_unpackhi_epi8 : m256 -> m256 -> m256 = "caml_mm256_unpackhi_epi8"
+external mm256_unpackhi_epi16 : m256 -> m256 -> m256 = "caml_mm256_unpackhi_epi16"
+external mm256_unpackhi_epi32 : m256 -> m256 -> m256 = "caml_mm256_unpackhi_epi32"
+external mm256_unpackhi_epi64 : m256 -> m256 -> m256 = "caml_mm256_unpackhi_epi64"

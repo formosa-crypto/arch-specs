@@ -289,6 +289,13 @@ CAMLprim value NX(caml_,F)(value a, value b, value c) {   \
 #define BIND_128x2_128(F) BIND2(F, M128i, M128i, M128i)
 
 extern "C" {
+BIND1(mm256_broadcastq_epi64, M256i, M128i);
+BIND1(mm256_broadcastd_epi32, M256i, M128i);
+BIND1(mm256_broadcastw_epi16, M256i, M128i);
+BIND1(mm256_broadcastsi128_si256, M256i, M128i);
+
+BIND_256x2_256(mm256_permutevar8x32_epi32);
+
 BIND_128x2_128(mm_and_si128);
 BIND_256x2_256(mm256_and_si256);
 
@@ -333,4 +340,14 @@ BIND2(mm256_sllv_epi64, M256i, M256i, M256i);
 
 BIND2(mm256_srlv_epi32, M256i, M256i, M256i);
 BIND2(mm256_srlv_epi64, M256i, M256i, M256i);
+
+BIND2(mm256_unpacklo_epi8, M256i, M256i, M256i);
+BIND2(mm256_unpacklo_epi16, M256i, M256i, M256i);
+BIND2(mm256_unpacklo_epi32, M256i, M256i, M256i);
+BIND2(mm256_unpacklo_epi64, M256i, M256i, M256i);
+
+BIND2(mm256_unpackhi_epi8, M256i, M256i, M256i);
+BIND2(mm256_unpackhi_epi16, M256i, M256i, M256i);
+BIND2(mm256_unpackhi_epi32, M256i, M256i, M256i);
+BIND2(mm256_unpackhi_epi64, M256i, M256i, M256i);
 }
