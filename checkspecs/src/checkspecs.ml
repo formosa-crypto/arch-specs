@@ -81,6 +81,33 @@ let tests : test list = [
   { name = "VPERMD"
   ; prim = (prim2 (M256, M256) M256 (fun w idx -> Avx2.mm256_permutevar8x32_epi32 idx w)); }
   ;
+  { name = "VPERM2I128"
+  ; prim = (prim3 (M256, M256, Imm8) M256 Avx2.mm256_permute2x128_si256); }
+  ;
+  { name = "VPBLEND_8u16"
+  ; prim = (prim3 (M128, M128, Imm8) M128 Avx2.mm_blend_epi16); }
+  ;
+  { name = "VPBLEND_4u32"
+  ; prim = (prim3 (M128, M128, Imm8) M128 Avx2.mm_blend_epi32); }
+  ;
+  { name = "VPBLEND_16u16"
+  ; prim = (prim3 (M256, M256, Imm8) M256 Avx2.mm256_blend_epi16); }
+  ;
+  { name = "VPBLEND_8u32"
+  ; prim = (prim3 (M256, M256, Imm8) M256 Avx2.mm256_blend_epi32); }
+  ;
+  { name = "VPACKSS_16u16"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_packs_epi16); }
+  ;
+  { name = "VPACKSS_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_packs_epi32); }
+  ;
+  { name = "VPACKUS_16u16"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_packus_epi16); }
+  ;
+  { name = "VPACKUS_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_packus_epi32); }
+  ;
   { name = "VPAND_128"
   ; prim = (prim2 (M128, M128) M128 Avx2.mm_and_si128); }
   ;
@@ -128,6 +155,12 @@ let tests : test list = [
   ;
   { name = "VPSUB_32u8"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_sub_epi8); }
+  ;
+  { name = "VPMADDUBSW_256"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_maddubs_epi16); }
+  ;
+  { name = "VPMADDWD_256"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_madd_epi16); }
   ;
   { name = "VPMULL_16u16"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_mullo_epi16); }
@@ -185,6 +218,42 @@ let tests : test list = [
   ;
   { name = "VPSRLV_8u32"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_srlv_epi32); }
+  ;
+  { name = "VPSLLDQ_128"
+  ; prim = (prim2 (M128, Imm8) M128 Avx2.mm_bslli_si128); }
+  ;
+  { name = "VPSRLDQ_128"
+  ; prim = (prim2 (M128, Imm8) M128 Avx2.mm_bsrli_si128); }
+  ;
+  { name = "VPSLLDQ_256"
+  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_bslli_epi128); }
+  ;
+  { name = "VPSRLDQ_256"
+  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_bsrli_epi128); }
+  ;
+  { name = "VPUNPCKL_2u64"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpacklo_epi64); }
+  ;
+  { name = "VPUNPCKL_4u32"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpacklo_epi32); }
+  ;
+  { name = "VPUNPCKL_8u16"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpacklo_epi16); }
+  ;
+  { name = "VPUNPCKL_16u8"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpacklo_epi8); }
+  ;
+  { name = "VPUNPCKH_2u64"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpackhi_epi64); }
+  ;
+  { name = "VPUNPCKH_4u32"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpackhi_epi32); }
+  ;
+  { name = "VPUNPCKH_8u16"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpackhi_epi16); }
+  ;
+  { name = "VPUNPCKH_16u8"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpackhi_epi8); }
   ;
   { name = "VPUNPCKL_4u64"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_unpacklo_epi64); }
@@ -460,6 +529,8 @@ let cli_term : cli Cmdliner.Term.t =
 
 (* ------------------------------------------------------------------------ *)
 let main (cli : cli) =
+  Random.self_init ();
+
   if cli.fail_on_simde && A.using_simde () then (
     Format.eprintf "SIMDe is enabled; refusing to run with --fail-on-simde.@.";
     exit 1

@@ -9,73 +9,9 @@ VPINSR_8u16(w1@128, w2@16, i@8) -> @128 =
 VPINSR_2u64(w1@128, w2@64, i@8) -> @128 =
   w1[@64|i[@1|0] <- w2]
 
-#CHECKME
-# Intel intrinsic: _mm256_permute2x128_si256
-VPERM2I128(src1@256, src2@256, i@8) -> @256 =
-  map<4,2>(
-    fun control@4 .
-        control[3] ? 0@128 :
-          let w1 = concat<256>(src1,src2) in
-          let w2 = w1[@128|control[@2|0]] in w2,
-      i)
 
-VPSLLDQ_256(w@256, count@8) -> @256 =
-  map<128, 2>(sll<128>(., sll<8>(count, 3)), w)
 
-# CHECKME
-VPSRLDQ_256(w@256, count@8) -> @256 =
-  map<128, 2>(srl<128>(., sll<8>(count, 3)), w)
 
-VPSLLDQ_128(w@128, count@8) -> @128 =
-  sll<128>(w, sll<8>(count, 3))
-
-VPSRLDQ_128(w@128, count@8) -> @128 =
-  srl<128>(w, sll<8>(count, 3))
-
-# Intel intrinsic: _mm256_maddubs_epi16
-VPMADDUBSW_256(w1@256, w2@256) -> @256 =
-  map<16, 16>(
-    fun x@16 y@16 .
-      ssadd<16>(
-        usmul<8>(x[@8|0], y[@8|0]),
-        usmul<8>(x[@8|1], y[@8|1])
-      ),
-    w1,
-    w2
-  )
-
-VPMADDWD_16u16(w1@256, w2@256) -> @256 =
-  map<32, 8>(
-    fun x@32 y@32 .
-      add<32>(
-        smul<16>(x[@16|0], y[@16|0]),
-        smul<16>(x[@16|1], y[@16|1])
-      ),
-    w1,
-    w2
-  )
-
-# Intel intrinsic: _mm256_packus_epi16
-VPACKUS_16u16(w1@256, w2@256) -> @256 =
-  let pack (w@128) = map<16, 8>(usat<16, 8>, w) in
-
-  concat<64>(
-    pack(w1[@128|0]),
-    pack(w2[@128|0]),
-    pack(w1[@128|1]),
-    pack(w2[@128|1])
-  )
-
-# Intel intrincis: _mm256_packs_epi16
-VPACKSS_16u16(w1@256, w2@256) -> @256 =
-  let pack (w@128) = map<16, 8>(ssat<16, 8>, w) in
-
-  concat<64>(
-    pack(w1[@128|0]),
-    pack(w2[@128|0]),
-    pack(w1[@128|1]),
-    pack(w2[@128|1])
-  )
 
 
 
@@ -103,8 +39,8 @@ VPBLEND_8u32(w1@256, w2@256, c@8) -> @256 =
 # CHECKME
 # Intel intrinsic: _mm256_blend_epi32
 # FIXME: we need an heterogeneous `map' combinator
-VPBLEND_32u8(w1@256, w2@256, c@256) -> @256 =
-  map<8, 32>(
+VPBLEND_16u8(w1@128, w2@128, c@128) -> @128 =
+  map<8, 16>(
     fun c@8 w1@8 w2@8 . c[7] ? w2 : w1,
     c,
     w1,
@@ -114,13 +50,14 @@ VPBLEND_32u8(w1@256, w2@256, c@256) -> @256 =
 # CHECKME
 # Intel intrinsic: _mm256_blend_epi32
 # FIXME: we need an heterogeneous `map' combinator
-VPBLEND_16u8(w1@128, w2@128, c@128) -> @128 =
-  map<8, 16>(
+VPBLEND_32u8(w1@256, w2@256, c@256) -> @256 =
+  map<8, 32>(
     fun c@8 w1@8 w2@8 . c[7] ? w2 : w1,
     c,
     w1,
     w2
   )
+
 
 # Intel intrinsic: _mm256_blend_epi16
 # FIXME: we need an heterogeneous `map' combinator
