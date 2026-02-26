@@ -9,7 +9,11 @@ module S = Lospecs
 type _ primty =
   | M256  : A.m256 primty
   | M128  : A.m128 primty
-  | Imm8  : int primty
+  | M64   : int64 primty
+  | M32   : int32 primty
+  | M16   : int primty
+  | M8    : int primty
+  | Imm8  : { min: int; max: int } -> int primty
 
 (* ------------------------------------------------------------------------ *)
 type primval =
@@ -49,14 +53,73 @@ let prim2 ?e1 ?e2 (a1, a2) r f =
 let prim3 ?e1 ?e2 ?e3 (a1, a2, a3) r f =
   Prim (mkarg ?extend:e1 a1 (mkarg ?extend:e2 a2 (mkarg ?extend:e3 a3 (mkret r))), f)
 
+(* ------------------------------------------------------------------------ *)
+let imm8 ?(min = 0) ?(max = 255) () =
+  Imm8 { min; max; }
+
+(* ------------------------------------------------------------------------ *)
+let size_of_primty
+  : type r . r primty -> int
+  = fun (pty : r primty) ->
+  match pty with
+  | M256   -> 256
+  | M128   -> 128
+  | M64    ->  64
+  | M32    ->  32
+  | M16    ->  16
+  | M8     ->   8
+  | Imm8 _ ->   8
+
 (* ======================================================================== *)
 type test = {
   name : string;
   prim : prim;
 }
 
-(* ------------------------------------------------------------------------ *)
+(* ------------------------x------------------------------------------------ *)
 let tests : test list = [
+  { name = "VPINSR_16u8"
+  ; prim = (prim3 (M128, M8, imm8 ~max:15 ()) M128 Avx2.mm_insert_epi8); }
+  ;
+  { name = "VPINSR_8u16"
+  ; prim = (prim3 (M128, M16, imm8 ~max:7 ()) M128 Avx2.mm_insert_epi16); }
+  ;
+  { name = "VPINSR_4u32"
+  ; prim = (prim3 (M128, M32, imm8 ~max:3 ()) M128 Avx2.mm_insert_epi32); }
+  ;
+  { name = "VPINSR_2u64"
+  ; prim = (prim3 (M128, M64, imm8 ~max:1 ()) M128 Avx2.mm_insert_epi64); }
+  ;
+  { name = "VINSERTI128"
+  ; prim = (prim3 (M256, M128, imm8 ~max:1 ()) M256 Avx2.mm256_inserti128_si256); }
+  ;
+  { name = "VPEXTR_16u8"
+  ; prim = (prim2 (M128, imm8 ~max:15 ()) M8 Avx2.mm_extract_epi8); }
+  ;
+  { name = "VPEXTR_8u16"
+  ; prim = (prim2 (M128, imm8 ~max:7 ()) M16 Avx2.mm_extract_epi16); }
+  ;
+  { name = "VPEXTR_4u32"
+  ; prim = (prim2 (M128, imm8 ~max:3 ()) M32 Avx2.mm_extract_epi32); }
+  ;
+  { name = "VPEXTR_2u64"
+  ; prim = (prim2 (M128, imm8 ~max:1 ()) M64 Avx2.mm_extract_epi64); }
+  ;
+  { name = "VEXTRACTI128"
+  ; prim = (prim2 (M256, imm8 ~max:1 ()) M128 Avx2.mm256_extracti128_si256); }
+  ;
+  { name = "VMOVSLDUP_128"
+  ; prim = (prim1 M128 M128 Avx2.mm_moveldup_ps); }
+  ;
+  { name = "VMOVSLDUP_256"
+  ; prim = (prim1 M256 M256 Avx2.mm256_moveldup_ps); }
+  ;
+  { name = "VPMOVMSKB_128"
+  ; prim = (prim1 M128 M32 Avx2.mm_movemask_epi8); }
+  ;
+  { name = "VPMOVMSKB_256"
+  ; prim = (prim1 M256 M32 Avx2.mm256_movemask_epi8); }
+  ;
   { name = "VPBROADCAST_2u128"
   ; prim = (prim1 M128 M256 Avx2.mm256_broadcastsi128_si256); }
   ;
@@ -69,32 +132,44 @@ let tests : test list = [
   { name = "VPBROADCAST_16u16"
   ; prim = (prim1 ~e:EZero M128 M256 Avx2.mm256_broadcastw_epi16); }
   ;
+  { name = "VPSHUFD_128"
+  ; prim = (prim2 (M128, imm8 ()) M128 Avx2.mm_shuffle_epi32); }
+  ;
+  { name = "VPSHUFB_128"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_shuffle_epi8); }
+  ;
   { name = "VPSHUFD_256"
-  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_shuffle_epi32); }
+  ; prim = (prim2 (M256, imm8 ()) M256 Avx2.mm256_shuffle_epi32); }
   ;
   { name = "VPSHUFB_256"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_shuffle_epi8); }
   ;
   { name = "VPERMQ"
-  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_permute4x64_epi64); }
+  ; prim = (prim2 (M256, imm8 ()) M256 Avx2.mm256_permute4x64_epi64); }
   ;
   { name = "VPERMD"
   ; prim = (prim2 (M256, M256) M256 (fun w idx -> Avx2.mm256_permutevar8x32_epi32 idx w)); }
   ;
   { name = "VPERM2I128"
-  ; prim = (prim3 (M256, M256, Imm8) M256 Avx2.mm256_permute2x128_si256); }
+  ; prim = (prim3 (M256, M256, imm8 ()) M256 Avx2.mm256_permute2x128_si256); }
+  ;
+  { name = "VPBLENDVB_128"
+  ; prim = (prim3 (M128, M128, M128) M128 Avx2.mm_blendv_epi8); }
   ;
   { name = "VPBLEND_8u16"
-  ; prim = (prim3 (M128, M128, Imm8) M128 Avx2.mm_blend_epi16); }
+  ; prim = (prim3 (M128, M128, imm8 ()) M128 Avx2.mm_blend_epi16); }
   ;
   { name = "VPBLEND_4u32"
-  ; prim = (prim3 (M128, M128, Imm8) M128 Avx2.mm_blend_epi32); }
+  ; prim = (prim3 (M128, M128, imm8 ()) M128 Avx2.mm_blend_epi32); }
+  ;
+  { name = "VPBLENDVB_256"
+  ; prim = (prim3 (M256, M256, M256) M256 Avx2.mm256_blendv_epi8); }
   ;
   { name = "VPBLEND_16u16"
-  ; prim = (prim3 (M256, M256, Imm8) M256 Avx2.mm256_blend_epi16); }
+  ; prim = (prim3 (M256, M256, imm8 ()) M256 Avx2.mm256_blend_epi16); }
   ;
   { name = "VPBLEND_8u32"
-  ; prim = (prim3 (M256, M256, Imm8) M256 Avx2.mm256_blend_epi32); }
+  ; prim = (prim3 (M256, M256, imm8 ()) M256 Avx2.mm256_blend_epi32); }
   ;
   { name = "VPACKSS_16u16"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_packs_epi16); }
@@ -220,16 +295,16 @@ let tests : test list = [
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_srlv_epi32); }
   ;
   { name = "VPSLLDQ_128"
-  ; prim = (prim2 (M128, Imm8) M128 Avx2.mm_bslli_si128); }
+  ; prim = (prim2 (M128, imm8 ()) M128 Avx2.mm_bslli_si128); }
   ;
   { name = "VPSRLDQ_128"
-  ; prim = (prim2 (M128, Imm8) M128 Avx2.mm_bsrli_si128); }
+  ; prim = (prim2 (M128, imm8 ()) M128 Avx2.mm_bsrli_si128); }
   ;
   { name = "VPSLLDQ_256"
-  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_bslli_epi128); }
+  ; prim = (prim2 (M256, imm8 ()) M256 Avx2.mm256_bslli_epi128); }
   ;
   { name = "VPSRLDQ_256"
-  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_bsrli_epi128); }
+  ; prim = (prim2 (M256, imm8 ()) M256 Avx2.mm256_bsrli_epi128); }
   ;
   { name = "VPUNPCKL_2u64"
   ; prim = (prim2 (M128, M128) M128 Avx2.mm_unpacklo_epi64); }
@@ -303,7 +378,7 @@ let check_ty_compatible
 
     match ty with
     | `W tysize -> begin
-      let asize = match a with M256 -> 256 | M128 -> 128 | Imm8 -> 8 in
+      let asize = size_of_primty a in
       match extend with
       | ENone when tysize = asize -> ()
       | EZero when tysize <= asize -> ()
@@ -337,7 +412,13 @@ let generate_input
   match aty with
   | M256 -> A.M256.random ()
   | M128 -> A.M128.random ()
-  | Imm8 -> Random.int_in_range ~min:0 ~max:255
+  | M64  -> Random.bits64 ()
+  | M32  -> Random.bits32 ()
+  | M16  -> Random.int_in_range ~min:0 ~max:65535
+  | M8   -> Random.int_in_range ~min:0 ~max:255
+
+  | Imm8 { min; max } ->
+    Random.int_in_range ~min ~max
 
 (* ------------------------------------------------------------------------ *)
 let generate_test_vector (t : test) =
@@ -364,7 +445,21 @@ let bytes_of_primval (p : primval) : bytes =
     A.M256.to_bytes ~endianess:`Little m256
   | PrimVal (M128, m128) ->
     A.M128.to_bytes ~endianess:`Little m128
-  | PrimVal (Imm8, v) ->
+  | PrimVal (M64, m64) ->
+    let b = Buffer.create 8 in
+    Buffer.add_int64_le b m64;
+    Bytes.of_string (Buffer.contents b)
+  | PrimVal (M32, m32) ->
+    let b = Buffer.create 4 in
+    Buffer.add_int32_le b m32;
+    Bytes.of_string (Buffer.contents b)
+  | PrimVal (M16, m16) ->
+    let b = Buffer.create 2 in
+    Buffer.add_int16_le b m16;
+    Bytes.of_string (Buffer.contents b)
+  | PrimVal (M8, v) ->
+    Bytes.of_string (String.of_char (Char.chr v))
+  | PrimVal (Imm8 _, v) ->
     Bytes.of_string (String.of_char (Char.chr v))
 
 (* ======================================================================== *)

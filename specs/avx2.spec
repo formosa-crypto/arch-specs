@@ -1,3 +1,61 @@
+# Intel intrinsic: _mm_moveldup_ps
+VMOVSLDUP_128(a@128) -> @128 =
+  concat<32>(a[@32|0], a[@32|0], a[@32|2], a[@32|2])
+
+# Intel intrinsic: _mm256_moveldup_ps
+VMOVSLDUP_256(a@256) -> @256 =
+  let on128 (v@128) =
+    concat<32>(v[@32|0], v[@32|0], v[@32|2], v[@32|2]) in
+  map<128, 2>(on128, a)
+
+# Intel intrinsic: _mm_movemask_epi8
+VPMOVMSKB_128(w@128) -> @32 =
+  uextend<16, 32>(map<8, 16>(fun i@8 . i[7], w))
+
+# Intel intrinsic: _mm256_movemask_epi8
+VPMOVMSKB_256(w@256) -> @32 =
+  map<8, 32>(fun i@8 . i[7], w)
+
+# Intel intrisic: _mm_insert_epi8
+VPINSR_16u8(w1@128, w2@8, i@8) -> @128 =
+  w1[@8|i[@4|0] <- w2]
+
+# Intel intrisic: _mm_insert_epi16
+VPINSR_8u16(w1@128, w2@16, i@8) -> @128 =
+  w1[@16|i[@3|0] <- w2]
+
+# Intel intrisic: _mm_insert_epi32
+VPINSR_4u32(w1@128, w2@32, i@8) -> @128 =
+  w1[@32|i[@2|0] <- w2]
+
+# Intel intrisic: _mm_insert_epi64
+VPINSR_2u64(w1@128, w2@64, i@8) -> @128 =
+  w1[@64|i[@1|0] <- w2]
+
+# Intel intrinsic: _mm256_inserti128_si256
+VINSERTI128(w@256, m@128, i@8) -> @256 =
+  w[@128|i[0] <- m]
+
+# Intel intrisic: _mm_extract_epi8
+VPEXTR_16u8(w@128, i@8) -> @8 =
+  w[@8|i[@4|0]]
+
+# Intel intrisic: _mm_extract_epi16
+VPEXTR_8u16(w@128, i@8) -> @16 =
+  w[@16|i[@3|0]]
+
+# Intel intrisic: _mm_extract_epi32
+VPEXTR_4u32(w@128, i@8) -> @32 =
+  w[@32|i[@2|0]]
+
+# Intel intrisic: _mm_extract_epi64
+VPEXTR_2u64(w@128, i@8) -> @64 =
+  w[@64|i[@1|0]]
+
+# Intel intrinsic: _mm256_extracti128_si256
+VEXTRACTI128(w@256, i@8) -> @128 =
+  w[@128|i[0]]
+
 # Intel intrinsic: _mm256_broadcastq_epi64
 # Note: input should be @128
 VPBROADCAST_4u64(w@64) -> @256 = 
@@ -46,6 +104,15 @@ VPERM2I128(src1@256, src2@256, i@8) -> @256 =
           w[@128|control[@2|0]],
       i)
 
+# Intel intrinsic: _mm_shuffle_epi32
+VPSHUFD_128(w@128, idx@8) -> @128 =
+  concat<32>(
+    w[@32|idx[@2|0]],
+    w[@32|idx[@2|1]],
+    w[@32|idx[@2|2]],
+    w[@32|idx[@2|3]]
+  )
+
 # Intel intrinsic: _mm256_shuffle_epi32
 VPSHUFD_256(w@256, idx@8) -> @256 =
   let hi = w[@128|1] in
@@ -60,6 +127,13 @@ VPSHUFD_256(w@256, idx@8) -> @256 =
     hi[@32|idx[@2|1]],
     hi[@32|idx[@2|2]],
     hi[@32|idx[@2|3]]
+  )
+
+# Intel intrinsic: _mm_shuffle_epi8
+VPSHUFB_128(w@128, widx@128) -> @128 =
+  map<8, 16>(
+    fun idx@8 . idx[7] ? 0 : w[@8|idx[@4|0]],
+    widx
   )
 
 # Intel intrinsic: _mm256_shuffle_epi8
@@ -116,6 +190,24 @@ VPBLEND_16u16(w1@256, w2@256, c@8) -> @256 =
 
   map<16, 16>(
     fun c@16 w1@16 w2@16 . c[0] ? w2 : w1,
+    c,
+    w1,
+    w2
+  )
+
+# Intel intrisic: _mm_blendv_epi8
+VPBLENDVB_128(w1@128, w2@128, c@128) -> @128 =
+  map<8, 16>(
+    fun c@8 w1@8 w2@8 . c[7] ? w2 : w1,
+    c,
+    w1,
+    w2
+  )
+
+# Intel intrisic: _mm256_blendv_epi8
+VPBLENDVB_256(w1@256, w2@256, c@256) -> @256 =
+  map<8, 32>(
+    fun c@8 w1@8 w2@8 . c[7] ? w2 : w1,
     c,
     w1,
     w2
