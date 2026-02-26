@@ -1,20 +1,6 @@
 # See: https://www.intel.com/content/www/us/en/docs/intrinsics-guide/index.html
 # 256 bit logical and (maybe change in ecBDep to VPAND)
 
-
-
-
-# Intel intrinsic: _mm256_permute4x64_epi64
-VPERMQ(w@256, i@8) -> @256 =
-  let permute (i@2) = w[@64|i] in
-
-  concat<64>(
-    permute(i[@2|0]),
-    permute(i[@2|1]),
-    permute(i[@2|2]),
-    permute(i[@2|3])
-  )
-
 # CHECKME
 VPINSR_8u16(w1@128, w2@16, i@8) -> @128 =
   w1[@16|i[@3|0] <- w2]
@@ -91,33 +77,7 @@ VPACKSS_16u16(w1@256, w2@256) -> @256 =
     pack(w2[@128|1])
   )
 
-# Intel intrinsic: _mm256_shuffle_epi8
-VPSHUFB_256(w@256, widx@256) -> @256 =
-  map<128, 2>(
-    fun w@128 widx@128 .
-      map<8, 16>(
-        fun idx@8 . idx[7] ? 0 : w[@8|idx[@4|0]],
-        widx
-      ),
-    w,
-    widx
-  )
 
-# https://www.felixcloutier.com/x86/pshufd
-VPSHUFD_256(w@256, idx@8) -> @256 =
-  let hi = w[@128|1] in
-  let lo = w[@128|0] in
-  concat<32>(
-    lo[@32|idx[@2|0]],
-    lo[@32|idx[@2|1]],
-    lo[@32|idx[@2|2]],
-    lo[@32|idx[@2|3]],
-
-    hi[@32|idx[@2|0]],
-    hi[@32|idx[@2|1]],
-    hi[@32|idx[@2|2]],
-    hi[@32|idx[@2|3]]
-  )
 
 # https://www.felixcloutier.com/x86/pshufd
 VPSHUFD_128(w@128, idx@8) -> @128 =
@@ -210,14 +170,6 @@ VPBLENDVB_128(w1@128, w2@128, c@128) -> @128 =
   map<8, 16>(
     fun c@8 w1@8 w2@8 . c[7] ? w2 : w1,
     c,
-    w1,
-    w2
-  )
-
-# Intel intrinsic: _mm256_cmpgt_epi16
-VPCMPGT_16u16(w1@256, w2@256) -> @256 =
-  map<16, 16>(
-    fun w1@16 w2@16 . sgt<16>(w1, w2) ? 0xffff@16 : 0x0000@16,
     w1,
     w2
   )

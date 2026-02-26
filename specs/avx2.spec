@@ -17,11 +17,50 @@ VPBROADCAST_16u16(w@16) -> @256 =
 VPBROADCAST_2u128(w@128) -> @256 = 
   repeat<128>(w, 2)
 
+# Intel intrinsic: _mm256_permute4x64_epi64
+VPERMQ(w@256, i@8) -> @256 =
+  let permute (i@2) = w[@64|i] in
+
+  concat<64>(
+    permute(i[@2|0]),
+    permute(i[@2|1]),
+    permute(i[@2|2]),
+    permute(i[@2|3])
+  )
+
 # Intel intrinsic: _mm256_permutevar8x32_epi32
 # Note: arguments are swapped
 VPERMD(widx@256, w@256) -> @256 =
   map<32, 8>(
     fun idx@32 . let i = idx[0:3] in w[@32|i],
+    widx
+  )
+
+# Intel intrinsic: _mm256_shuffle_epi32
+VPSHUFD_256(w@256, idx@8) -> @256 =
+  let hi = w[@128|1] in
+  let lo = w[@128|0] in
+  concat<32>(
+    lo[@32|idx[@2|0]],
+    lo[@32|idx[@2|1]],
+    lo[@32|idx[@2|2]],
+    lo[@32|idx[@2|3]],
+
+    hi[@32|idx[@2|0]],
+    hi[@32|idx[@2|1]],
+    hi[@32|idx[@2|2]],
+    hi[@32|idx[@2|3]]
+  )
+
+# Intel intrinsic: _mm256_shuffle_epi8
+VPSHUFB_256(w@256, widx@256) -> @256 =
+  map<128, 2>(
+    fun w@128 widx@128 .
+      map<8, 16>(
+        fun idx@8 . idx[7] ? 0 : w[@8|idx[@4|0]],
+        widx
+      ),
+    w,
     widx
   )
 
@@ -108,6 +147,34 @@ VPMULHRS_16u16(w1@256, w2@256) -> @256 =
       let w = smul<16>(x, y) in
       let w = incr<32>(srl<32>(w, 14)) in
       w[1:16],
+    w1,
+    w2
+  )
+
+# FIXME: missing 4u64
+# Intel intrinsic: _mm256_cmpgt_epi32
+VPCMPGT_8u32(w1@256, w2@256) -> @256 =
+  map<32, 8>(
+    fun w1@32 w2@32 .
+      sgt<32>(w1, w2)
+      ? 0xffffffff@32
+      : 0x00000000@32,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpgt_epi16
+VPCMPGT_16u16(w1@256, w2@256) -> @256 =
+  map<16, 16>(
+    fun w1@16 w2@16 . sgt<16>(w1, w2) ? 0xffff@16 : 0x0000@16,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpgt_epi16
+VPCMPGT_32u8(w1@256, w2@256) -> @256 =
+  map<8, 32>(
+    fun w1@8 w2@8 . sgt<8>(w1, w2) ? 0xff@8 : 0x00@8,
     w1,
     w2
   )

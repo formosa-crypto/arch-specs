@@ -7,8 +7,9 @@ module S = Lospecs
 
 (* ======================================================================== *)
 type _ primty =
-  | M256 : A.m256 primty
-  | M128 : A.m128 primty
+  | M256  : A.m256 primty
+  | M128  : A.m128 primty
+  | Imm8  : int primty
 
 (* ------------------------------------------------------------------------ *)
 type primval =
@@ -67,6 +68,15 @@ let tests : test list = [
   ;
   { name = "VPBROADCAST_16u16"
   ; prim = (prim1 ~e:EZero M128 M256 Avx2.mm256_broadcastw_epi16); }
+  ;
+  { name = "VPSHUFD_256"
+  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_shuffle_epi32); }
+  ;
+  { name = "VPSHUFB_256"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_shuffle_epi8); }
+  ;
+  { name = "VPERMQ"
+  ; prim = (prim2 (M256, Imm8) M256 Avx2.mm256_permute4x64_epi64); }
   ;
   { name = "VPERMD"
   ; prim = (prim2 (M256, M256) M256 (fun w idx -> Avx2.mm256_permutevar8x32_epi32 idx w)); }
@@ -130,6 +140,15 @@ let tests : test list = [
   ;
   { name = "VPMULHRS_16u16"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_mulhrs_epi16); }
+  ;
+  { name = "VPCMPGT_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpgt_epi32); }
+  ;
+  { name = "VPCMPGT_16u16"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpgt_epi16); }
+  ;
+  { name = "VPCMPGT_32u8"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpgt_epi8); }
   ;
   { name = "VPSRL_4u64"
   ; prim = (prim2 (M256, M128) M256 Avx2.mm256_srl_epi64); }
@@ -215,7 +234,7 @@ let check_ty_compatible
 
     match ty with
     | `W tysize -> begin
-      let asize = match a with M256 -> 256 | M128 -> 128 in
+      let asize = match a with M256 -> 256 | M128 -> 128 | Imm8 -> 8 in
       match extend with
       | ENone when tysize = asize -> ()
       | EZero when tysize <= asize -> ()
@@ -242,12 +261,14 @@ let check_signature (t : test) (c : S.Ast.adef) =
   check_signature sig_ c.arguments
 
 (* ------------------------------------------------------------------------ *)
-let generate_input : type a . a primty -> a =
-  fun (aty : a primty) : a ->
+let generate_input
+  : type a . a primty -> a
+  = fun (aty : a primty) : a ->
 
   match aty with
   | M256 -> A.M256.random ()
   | M128 -> A.M128.random ()
+  | Imm8 -> Random.int_in_range ~min:0 ~max:255
 
 (* ------------------------------------------------------------------------ *)
 let generate_test_vector (t : test) =
@@ -274,6 +295,8 @@ let bytes_of_primval (p : primval) : bytes =
     A.M256.to_bytes ~endianess:`Little m256
   | PrimVal (M128, m128) ->
     A.M128.to_bytes ~endianess:`Little m128
+  | PrimVal (Imm8, v) ->
+    Bytes.of_string (String.of_char (Char.chr v))
 
 (* ======================================================================== *)
 let bar (name : string) (total : int) =
