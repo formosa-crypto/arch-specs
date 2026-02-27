@@ -20,6 +20,11 @@
 #endif
 
 /* -------------------------------------------------------------------- */
+#ifndef AVX2_BINDC_CASES
+#define AVX2_BINDC_CASES 256
+#endif
+
+/* -------------------------------------------------------------------- */
 typedef SIMD(_m128)  m128;
 typedef SIMD(_m128i) m128i;
 
@@ -379,144 +384,8 @@ CAMLprim value NX(caml_,F)(value a, value b, value imm8) { \
 /* -------------------------------------------------------------------- */
 # define BIND2C(F, U, T1, T2) BIND2C_N(F, U, T1, T2, 256)
 
-/* -------------------------------------------------------------------- */
-#define BIND_128x2_128(F) BIND2(F, M128i, M128i, M128i)
-#define BIND_128x3_128(F) BIND3(F, M128i, M128i, M128i, M128i)
-
-#define BIND_256x2_256(F) BIND2(F, M256i, M256i, M256i)
-#define BIND_256x3_256(F) BIND3(F, M256i, M256i, M256i, M256i)
-
-/* -------------------------------------------------------------------- */
-#define BINDC_128x2_128(F) BIND2C(F, M128i, M128i, M128i)
-#define BINDC_256x2_256(F) BIND2C(F, M256i, M256i, M256i)
 
 /* -------------------------------------------------------------------- */
 extern "C" {
-BIND1(mm_moveldup_ps, M128, M128);
-BIND1(mm256_moveldup_ps, M256, M256);
-
-BIND1(mm_movemask_epi8, Int32, M128i);
-BIND1(mm256_movemask_epi8, Int32, M256i);
-
-BIND1(mm256_broadcastq_epi64, M256i, M128i);
-BIND1(mm256_broadcastd_epi32, M256i, M128i);
-BIND1(mm256_broadcastw_epi16, M256i, M128i);
-BIND1(mm256_broadcastsi128_si256, M256i, M128i);
-
-BIND2C_N(mm_insert_epi8 , M128i, M128i,  Int8, 16);
-BIND2C_N(mm_insert_epi16, M128i, M128i, Int16,  8);
-BIND2C_N(mm_insert_epi32, M128i, M128i, Int32,  4);
-BIND2C_N(mm_insert_epi64, M128i, M128i, Int64,  2);
-
-BIND2C_N(mm256_inserti128_si256, M256i, M256i, M128i, 2);
-
-BIND1C_N(mm_extract_epi8 ,  Int8, M128i, 16);
-BIND1C_N(mm_extract_epi16, Int16, M128i,  8);
-BIND1C_N(mm_extract_epi32, Int32, M128i,  4);
-BIND1C_N(mm_extract_epi64, Int64, M128i,  2);
-
-BIND1C_N(mm256_extracti128_si256, M128i, M256i, 2);
-
-BIND_128x2_128(mm_shuffle_epi8);
-BIND1C(mm_shuffle_epi32, M128i, M128i);
-
-BIND_256x2_256(mm256_shuffle_epi8);
-BIND1C(mm256_shuffle_epi32, M256i, M256i);
-
-BIND1C(mm256_permute4x64_epi64, M256i, M256i);
-BIND_256x2_256(mm256_permutevar8x32_epi32);
-BINDC_256x2_256(mm256_permute2x128_si256);
-
-BIND_128x3_128(mm_blendv_epi8)
-BIND_256x3_256(mm256_blendv_epi8)
-
-BINDC_128x2_128(mm_blend_epi16);
-BINDC_128x2_128(mm_blend_epi32);
-
-BINDC_256x2_256(mm256_blend_epi16);
-BINDC_256x2_256(mm256_blend_epi32);
-
-BIND_256x2_256(mm256_packs_epi16)
-BIND_256x2_256(mm256_packs_epi32)
-
-BIND_256x2_256(mm256_packus_epi16)
-BIND_256x2_256(mm256_packus_epi32)
-
-BIND_128x2_128(mm_and_si128);
-BIND_256x2_256(mm256_and_si256);
-
-BIND_128x2_128(mm_andnot_si128);
-BIND_256x2_256(mm256_andnot_si256);
-
-BIND_128x2_128(mm_or_si128);
-BIND_256x2_256(mm256_or_si256);
-
-BIND_128x2_128(mm_xor_si128);
-BIND_256x2_256(mm256_xor_si256);
-
-BIND_256x2_256(mm256_add_epi8);
-BIND_256x2_256(mm256_add_epi16);
-BIND_256x2_256(mm256_add_epi32);
-BIND_256x2_256(mm256_add_epi64);
-
-BIND_256x2_256(mm256_sub_epi8);
-BIND_256x2_256(mm256_sub_epi16);
-BIND_256x2_256(mm256_sub_epi32);
-BIND_256x2_256(mm256_sub_epi64);
-
-BIND_256x2_256(mm256_maddubs_epi16);
-BIND_256x2_256(mm256_madd_epi16);
-
-BIND_256x2_256(mm256_mullo_epi16);
-BIND_256x2_256(mm256_mulhi_epi16);
-BIND_256x2_256(mm256_mulhi_epu16);
-
-BIND_256x2_256(mm256_mulhrs_epi16);
-
-BIND_256x2_256(mm256_cmpgt_epi8);
-BIND_256x2_256(mm256_cmpgt_epi16);
-BIND_256x2_256(mm256_cmpgt_epi32);
-BIND_256x2_256(mm256_cmpgt_epi64);
-
-BIND2(mm256_srl_epi16, M256i, M256i, M128i);
-BIND2(mm256_srl_epi32, M256i, M256i, M128i);
-BIND2(mm256_srl_epi64, M256i, M256i, M128i);
-
-BIND2(mm256_sra_epi16, M256i, M256i, M128i);
-BIND2(mm256_sra_epi32, M256i, M256i, M128i);
-
-BIND2(mm256_sll_epi16, M256i, M256i, M128i);
-BIND2(mm256_sll_epi32, M256i, M256i, M128i);
-BIND2(mm256_sll_epi64, M256i, M256i, M128i);
-
-BIND2(mm256_sllv_epi32, M256i, M256i, M256i);
-BIND2(mm256_sllv_epi64, M256i, M256i, M256i);
-
-BIND2(mm256_srlv_epi32, M256i, M256i, M256i);
-BIND2(mm256_srlv_epi64, M256i, M256i, M256i);
-
-BIND1C(mm_bslli_si128, M128i, M128i);
-BIND1C(mm_bsrli_si128, M128i, M128i);
-BIND1C(mm256_bslli_epi128, M256i, M256i);
-BIND1C(mm256_bsrli_epi128, M256i, M256i);
-
-BIND_128x2_128(mm_unpacklo_epi8);
-BIND_128x2_128(mm_unpacklo_epi16);
-BIND_128x2_128(mm_unpacklo_epi32);
-BIND_128x2_128(mm_unpacklo_epi64);
-
-BIND_128x2_128(mm_unpackhi_epi8);
-BIND_128x2_128(mm_unpackhi_epi16);
-BIND_128x2_128(mm_unpackhi_epi32);
-BIND_128x2_128(mm_unpackhi_epi64);
-
-BIND_256x2_256(mm256_unpacklo_epi8);
-BIND_256x2_256(mm256_unpacklo_epi16);
-BIND_256x2_256(mm256_unpacklo_epi32);
-BIND_256x2_256(mm256_unpacklo_epi64);
-
-BIND_256x2_256(mm256_unpackhi_epi8);
-BIND_256x2_256(mm256_unpackhi_epi16);
-BIND_256x2_256(mm256_unpackhi_epi32);
-BIND_256x2_256(mm256_unpackhi_epi64);
+#include "avx2_runtime_bindings.inc"
 }

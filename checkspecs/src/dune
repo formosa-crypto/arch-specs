@@ -10,15 +10,21 @@
  (enabled_if (or (= %{architecture} "amd64")
                  (= %{architecture} "i386")
                  (= %{architecture} "x86_64")))
- (targets avx2_arch_flags.sexp)
- (action (write-file %{targets} "-mavx2")))
+ (targets avx2_arch_flags.sexp avx2_include_dirs.sexp)
+ (action
+  (progn
+   (write-file avx2_arch_flags.sexp "-mavx2")
+   (write-file avx2_include_dirs.sexp "()"))))
 
 (rule
  (enabled_if (not (or (= %{architecture} "amd64")
                       (= %{architecture} "i386")
                       (= %{architecture} "x86_64"))))
- (targets avx2_arch_flags.sexp)
- (action (write-file %{targets} "-DSIMDe")))
+ (targets avx2_arch_flags.sexp avx2_include_dirs.sexp)
+ (action
+  (progn
+   (write-file avx2_arch_flags.sexp "-DSIMDe")
+   (write-file avx2_include_dirs.sexp "(../submodules/simde)"))))
 
 (executable
   (name checkspecs)
@@ -27,6 +33,9 @@
   (foreign_stubs
     (language cxx)
     (names avx2_runtime)
-    (flags (:standard -std=gnu++17 (:include avx2_arch_flags.sexp)))
-    (include_dirs ../submodules/simde))
+    (flags (:standard
+            -std=gnu++17
+            (:include avx2_arch_flags.sexp)
+            (:include avx2/avx2_runtime_bindings_dep.sexp)))
+    (include_dirs (include avx2_include_dirs.sexp)))
   (libraries batteries cmdliner hex progress easycrypt.lospecs))

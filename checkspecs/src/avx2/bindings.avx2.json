@@ -1,0 +1,762 @@
+{
+  "bindings": [
+    {
+      "name": "mm_moveldup_ps",
+      "ret": "M128",
+      "args": [
+        "M128"
+      ]
+    },
+    {
+      "name": "mm256_moveldup_ps",
+      "ret": "M256",
+      "args": [
+        "M256"
+      ]
+    },
+    {
+      "name": "mm_movemask_epi8",
+      "ret": "Int32",
+      "args": [
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_movemask_epi8",
+      "ret": "Int32",
+      "args": [
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_broadcastq_epi64",
+      "ret": "M256i",
+      "args": [
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_broadcastd_epi32",
+      "ret": "M256i",
+      "args": [
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_broadcastw_epi16",
+      "ret": "M256i",
+      "args": [
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_broadcastsi128_si256",
+      "ret": "M256i",
+      "args": [
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_inserti128_si256",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i",
+        "Imm8"
+      ],
+      "imm_bound": 2
+    },
+    {
+      "name": "mm_insert_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Int8",
+        "Imm8"
+      ],
+      "imm_bound": 16
+    },
+    {
+      "name": "mm_insert_epi16",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Int16",
+        "Imm8"
+      ],
+      "imm_bound": 8
+    },
+    {
+      "name": "mm_insert_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Int32",
+        "Imm8"
+      ],
+      "imm_bound": 4
+    },
+    {
+      "name": "mm_insert_epi64",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Int64",
+        "Imm8"
+      ],
+      "imm_bound": 2
+    },
+    {
+      "name": "mm256_extracti128_si256",
+      "ret": "M128i",
+      "args": [
+        "M256i",
+        "Imm8"
+      ],
+      "imm_bound": 2
+    },
+    {
+      "name": "mm_extract_epi8",
+      "ret": "Int8",
+      "args": [
+        "M128i",
+        "Imm8"
+      ],
+      "imm_bound": 16
+    },
+    {
+      "name": "mm_extract_epi16",
+      "ret": "Int16",
+      "args": [
+        "M128i",
+        "Imm8"
+      ],
+      "imm_bound": 8
+    },
+    {
+      "name": "mm_extract_epi32",
+      "ret": "Int32",
+      "args": [
+        "M128i",
+        "Imm8"
+      ],
+      "imm_bound": 4
+    },
+    {
+      "name": "mm_extract_epi64",
+      "ret": "Int64",
+      "args": [
+        "M128i",
+        "Imm8"
+      ],
+      "imm_bound": 2
+    },
+    {
+      "name": "mm_shuffle_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm_shuffle_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_shuffle_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_shuffle_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_permute4x64_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_permutevar8x32_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_permute2x128_si256",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm_blendv_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_blend_epi16",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm_blend_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_blendv_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_blend_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_blend_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_packs_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_packs_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_packus_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_packus_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm_and_si128",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_and_si256",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm_andnot_si128",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_andnot_si256",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm_or_si128",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_or_si256",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm_xor_si128",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_xor_si256",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_add_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_add_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_add_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_add_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_sub_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_sub_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_sub_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_sub_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_maddubs_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_madd_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_mullo_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_mulhi_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_mulhi_epu16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_mulhrs_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpgt_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpgt_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpgt_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpgt_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_srl_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_srl_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_srl_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_sra_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_sra_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_sll_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_sll_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_sll_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_srlv_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_srlv_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_sllv_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_sllv_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm_bslli_si128",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm_bsrli_si128",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_bslli_epi128",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm256_bsrli_epi128",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "Imm8"
+      ]
+    },
+    {
+      "name": "mm_unpacklo_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpacklo_epi16",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpacklo_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpacklo_epi64",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpackhi_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpackhi_epi16",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpackhi_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_unpackhi_epi64",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_unpacklo_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpacklo_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpacklo_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpacklo_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpackhi_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpackhi_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpackhi_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_unpackhi_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    }
+  ]
+}

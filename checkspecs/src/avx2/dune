@@ -1,0 +1,22 @@
+(rule
+ (deps bindings.avx2.json scripts/bindings.py)
+ (target avx2_bindings_gen.ml)
+ (action
+  (run python3 %{dep:scripts/bindings.py}
+       --mode ml
+       %{dep:bindings.avx2.json}
+       %{target})))
+
+(rule
+ (deps bindings.avx2.json scripts/bindings.py)
+ (target avx2_runtime_bindings.inc)
+ (action
+  (run python3 %{dep:scripts/bindings.py}
+       --mode cpp
+       %{dep:bindings.avx2.json}
+       %{target})))
+
+(rule
+ (deps avx2_runtime_bindings.inc)
+ (target avx2_runtime_bindings_dep.sexp)
+ (action (write-file %{target} "()")))
