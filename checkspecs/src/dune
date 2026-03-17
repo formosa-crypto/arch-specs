@@ -37,5 +37,5 @@
             -std=gnu++17
             (:include avx2_arch_flags.sexp)
             (:include avx2/avx2_runtime_bindings_dep.sexp)))
-    (include_dirs (include avx2_include_dirs.sexp)))
+    (include_dirs avx2 (include avx2_include_dirs.sexp)))
   (libraries batteries cmdliner hex progress easycrypt.lospecs))

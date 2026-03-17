@@ -471,6 +471,102 @@
       ]
     },
     {
+      "name": "mm_cmpeq_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_cmpeq_epi16",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_cmpeq_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_cmpeq_epi64",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm256_cmpeq_epi8",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpeq_epi16",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpeq_epi32",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm256_cmpeq_epi64",
+      "ret": "M256i",
+      "args": [
+        "M256i",
+        "M256i"
+      ]
+    },
+    {
+      "name": "mm_cmpgt_epi8",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_cmpgt_epi16",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_cmpgt_epi32",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
+      "name": "mm_cmpgt_epi64",
+      "ret": "M128i",
+      "args": [
+        "M128i",
+        "M128i"
+      ]
+    },
+    {
       "name": "mm256_cmpgt_epi8",
       "ret": "M256i",
       "args": [

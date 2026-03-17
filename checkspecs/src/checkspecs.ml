@@ -249,6 +249,45 @@ let tests : test list = [
   { name = "VPMULHRS_16u16"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_mulhrs_epi16); }
   ;
+  { name = "VPCMPEQ_2u64"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpeq_epi64); }
+  ;
+  { name = "VPCMPEQ_4u32"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpeq_epi32); }
+  ;
+  { name = "VPCMPEQ_8u16"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpeq_epi16); }
+  ;
+  { name = "VPCMPEQ_16u8"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpeq_epi8); }
+  ;
+  { name = "VPCMPEQ_4u64"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpeq_epi64); }
+  ;
+  { name = "VPCMPEQ_8u32"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpeq_epi32); }
+  ;
+  { name = "VPCMPEQ_16u16"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpeq_epi16); }
+  ;
+  { name = "VPCMPEQ_32u8"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpeq_epi8); }
+  ;
+  { name = "VPCMPGT_2u64"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpgt_epi64); }
+  ;
+  { name = "VPCMPGT_4u32"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpgt_epi32); }
+  ;
+  { name = "VPCMPGT_8u16"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpgt_epi16); }
+  ;
+  { name = "VPCMPGT_16u8"
+  ; prim = (prim2 (M128, M128) M128 Avx2.mm_cmpgt_epi8); }
+  ;
+  { name = "VPCMPGT_4u64"
+  ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpgt_epi64); }
+  ;
   { name = "VPCMPGT_8u32"
   ; prim = (prim2 (M256, M256) M256 Avx2.mm256_cmpgt_epi32); }
   ;
