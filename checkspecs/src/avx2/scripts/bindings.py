@@ -4,6 +4,7 @@
 import argparse
 import abc
 import dataclasses
+import hashlib
 import json
 import sys
 import pathlib
@@ -146,9 +147,22 @@ class CppRenderer(Renderer):
 
 
 # ------------------------------------------------------------------------
+class DepRenderer(Renderer):
+  def render(self, bindings: List[Binding]) -> str:
+    payload = json.dumps(
+      [dataclasses.asdict(binding) for binding in bindings],
+      sort_keys=True,
+      separators=(",", ":"),
+    )
+    digest = hashlib.sha256(payload.encode("utf-8")).hexdigest()[:16]
+    return f"(-DAVX2_BINDINGS_DIGEST=0x{digest})\n"
+
+
+# ------------------------------------------------------------------------
 RENDERER_TYPES: Dict[str, Type[Renderer]] = {
   "ml": MlRenderer,
   "cpp": CppRenderer,
+  "dep": DepRenderer,
 }
 
 

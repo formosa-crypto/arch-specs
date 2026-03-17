@@ -17,6 +17,10 @@
        %{target})))
 
 (rule
- (deps avx2_runtime_bindings.inc)
+ (deps bindings.avx2.json scripts/bindings.py)
  (target avx2_runtime_bindings_dep.sexp)
- (action (write-file %{target} "()")))
+ (action
+  (run python3 %{dep:scripts/bindings.py}
+       --mode dep
+       %{dep:bindings.avx2.json}
+       %{target})))

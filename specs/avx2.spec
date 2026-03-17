@@ -368,7 +368,131 @@ VPMULHRS_16u16(w1@256, w2@256) -> @256 =
     w2
   )
 
-# FIXME: missing 4u64
+# Intel intrinsic: _mm_cmpeq_epi64
+VPCMPEQ_2u64(w1@128, w2@128) -> @128 =
+  map<64, 2>(
+    fun w1@64 w2@64 .
+      eq<64>(w1, w2)
+      ? 0xffffffffffffffff@64
+      : 0x0000000000000000@64,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpeq_epi32
+VPCMPEQ_4u32(w1@128, w2@128) -> @128 =
+  map<32, 4>(
+    fun w1@32 w2@32 .
+      eq<32>(w1, w2)
+      ? 0xffffffff@32
+      : 0x00000000@32,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpeq_epi16
+VPCMPEQ_8u16(w1@128, w2@128) -> @128 =
+  map<16, 8>(
+    fun w1@16 w2@16 . eq<16>(w1, w2) ? 0xffff@16 : 0x0000@16,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpeq_epi8
+VPCMPEQ_16u8(w1@128, w2@128) -> @128 =
+  map<8, 16>(
+    fun w1@8 w2@8 . eq<8>(w1, w2) ? 0xff@8 : 0x00@8,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpeq_epi64
+VPCMPEQ_4u64(w1@256, w2@256) -> @256 =
+  map<64, 4>(
+    fun w1@64 w2@64 .
+      eq<64>(w1, w2)
+      ? 0xffffffffffffffff@64
+      : 0x0000000000000000@64,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpeq_epi32
+VPCMPEQ_8u32(w1@256, w2@256) -> @256 =
+  map<32, 8>(
+    fun w1@32 w2@32 .
+      eq<32>(w1, w2)
+      ? 0xffffffff@32
+      : 0x00000000@32,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpeq_epi16
+VPCMPEQ_16u16(w1@256, w2@256) -> @256 =
+  map<16, 16>(
+    fun w1@16 w2@16 . eq<16>(w1, w2) ? 0xffff@16 : 0x0000@16,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpeq_epi8
+VPCMPEQ_32u8(w1@256, w2@256) -> @256 =
+  map<8, 32>(
+    fun w1@8 w2@8 . eq<8>(w1, w2) ? 0xff@8 : 0x00@8,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpgt_epi64
+VPCMPGT_2u64(w1@128, w2@128) -> @128 =
+  map<64, 2>(
+    fun w1@64 w2@64 .
+      sgt<64>(w1, w2)
+      ? 0xffffffffffffffff@64
+      : 0x0000000000000000@64,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpgt_epi32
+VPCMPGT_4u32(w1@128, w2@128) -> @128 =
+  map<32, 4>(
+    fun w1@32 w2@32 .
+      sgt<32>(w1, w2)
+      ? 0xffffffff@32
+      : 0x00000000@32,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpgt_epi16
+VPCMPGT_8u16(w1@128, w2@128) -> @128 =
+  map<16, 8>(
+    fun w1@16 w2@16 . sgt<16>(w1, w2) ? 0xffff@16 : 0x0000@16,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm_cmpgt_epi8
+VPCMPGT_16u8(w1@128, w2@128) -> @128 =
+  map<8, 16>(
+    fun w1@8 w2@8 . sgt<8>(w1, w2) ? 0xff@8 : 0x00@8,
+    w1,
+    w2
+  )
+
+# Intel intrinsic: _mm256_cmpgt_epi64
+VPCMPGT_4u64(w1@256, w2@256) -> @256 =
+  map<64, 4>(
+    fun w1@64 w2@64 .
+      sgt<64>(w1, w2)
+      ? 0xffffffffffffffff@64
+      : 0x0000000000000000@64,
+    w1,
+    w2
+  )
+
 # Intel intrinsic: _mm256_cmpgt_epi32
 VPCMPGT_8u32(w1@256, w2@256) -> @256 =
   map<32, 8>(
@@ -388,7 +512,7 @@ VPCMPGT_16u16(w1@256, w2@256) -> @256 =
     w2
   )
 
-# Intel intrinsic: _mm256_cmpgt_epi16
+# Intel intrinsic: _mm256_cmpgt_epi8
 VPCMPGT_32u8(w1@256, w2@256) -> @256 =
   map<8, 32>(
     fun w1@8 w2@8 . sgt<8>(w1, w2) ? 0xff@8 : 0x00@8,
