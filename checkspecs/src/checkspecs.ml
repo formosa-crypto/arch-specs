@@ -529,7 +529,7 @@ let evaluate_test ~(ntests : int) (t : test) (c : S.Ast.adef) =
     S.Circuit.reg ~name ~size in
 
   let regs = List.mapi reg_of_aword (List.map snd c.arguments) in
-  let circuit = S.Circuit_spec.circuit_of_specification regs c in
+  let circuit = S.Specifications.circuit_of_specification regs c in
 
   let bar = bar t.name ntests in
 
@@ -671,7 +671,7 @@ let main (cli : cli) =
   );
 
   let specs  = File.with_file_in cli.spec (S.Io.parse cli.spec) in
-  let specs  = S.Typing.tt_program S.Typing.Env.empty specs in
+  let specs  = S.Typing.tt_program specs in
   let specs  =
     match cli.filter with
     | None -> specs
