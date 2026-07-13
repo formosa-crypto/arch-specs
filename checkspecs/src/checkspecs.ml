@@ -540,7 +540,7 @@ let evaluate_test ~(ntests : int) (t : test) (c : S.Ast.adef) =
     let inputs = Array.of_list inputs in
 
     let env ((n, i) : S.Aig.var) = S.Aig.get_bit inputs.(n) i in
-    let cout = Array.map (S.Aig.eval env) circuit in
+    let cout = Array.map (S.Aig.eval env) (S.Circuit.Reg.to_array circuit) in
     let cout = S.Circuit.bytes_of_bools cout in
 
     if cout <> output then

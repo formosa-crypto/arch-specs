@@ -27,7 +27,7 @@ jobs:
           opam-disable-sandboxing: true
 
       - name: Pin easycrypt from GitHub branch
-        run: opam pin add -ny easycrypt git+https://github.com/EasyCrypt/easycrypt.git#bdep_ecCircuitsRefactor
+        run: opam pin add -ny easycrypt git+https://github.com/EasyCrypt/easycrypt.git
 
       - name: Install dependencies
         run: opam install --deps-only -y .
